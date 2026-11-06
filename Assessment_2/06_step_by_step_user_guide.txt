@@ -1,0 +1,69 @@
+Section 6: Step by Step User Guide and Operational Manual
+
+6.1 System Prerequisites and Installation
+
+To successfully execute the Customer Churn AI system, the host environment must meet the following technical specifications:
+1. Python Runtime: Python version 3.10, 3.11, or 3.12 installed on Windows, macOS, or Linux.
+2. Required Python Libraries: The software relies upon five standard open source scientific computing libraries:
+   pandas: for tabular dataset ingestion and data wrangling
+   numpy: for numerical array manipulation and statistical bounding
+   scikit learn: for preprocessing, clustering, estimators, and metrics
+   matplotlib: for core graphical rendering and layout generation
+   seaborn: for advanced statistical visualization styling
+
+To install all required dependencies in a single terminal command, open a command prompt or terminal window and enter:
+pip install numpy pandas scikit learn matplotlib seaborn
+
+6.2 Directory Structure Configuration
+
+Ensure that all project files reside in the same working directory. The directory layout should appear as follows:
+Project Directory
+  customer_churn.csv (Raw dataset file)
+  customer_churn_pipeline.py (Main application program)
+  customer_churn_notebook.ipynb (Jupyter Notebook interface)
+  outputs (Destination folder automatically created for graphics)
+
+6.3 Execution via Command Line Interface (CLI)
+
+The primary method for executing the full computing pipeline is via the terminal:
+Step 1: Open the command prompt or terminal application.
+Step 2: Navigate to the directory containing customer_churn_pipeline.py.
+Step 3: Execute the script by typing:
+python customer_churn_pipeline.py
+
+Step 4: Observe the real time execution progress printed to the console:
+The script first logs the SHA 256 data integrity checksum.
+Step 1 confirms dataset loading (7043 rows, 21 columns).
+Step 2 confirms data cleaning, dropping customerID, and median imputation of 11 TotalCharges records.
+Step 3 displays feature transformation to 30 encoded columns and train test splitting.
+Step 4 logs K Means cluster percentages and PCA explained variance ratios.
+Step 5 displays the best hyperparameters found by GridSearchCV.
+Step 6 prints the full classification report and model benchmarking table.
+
+Execution takes approximately 10 to 15 seconds on a modern computer.
+
+6.4 Execution via Jupyter Notebook or Google Colab
+
+Users who prefer an interactive environment can utilize customer_churn_notebook.ipynb:
+Step 1: Launch Jupyter Notebook, JupyterLab, Visual Studio Code, or Google Colab.
+Step 2: Open customer_churn_notebook.ipynb.
+Step 3: Ensure customer_churn.csv is present in the working environment.
+Step 4: Execute the cells sequentially. Cell 1 executes the complete pipeline, and Cell 2 automatically displays all six generated figures inline within the notebook interface.
+
+6.5 Accessing and Utilizing Output Artifacts
+
+Upon completion, all generated visualization charts are stored inside the outputs folder:
+1. churn_distribution.png: Visual evidence of class distribution.
+2. kmeans_evaluation.png: Dual plot of Elbow inertia curve and Silhouette score curve.
+3. pca_customer_clusters.png: Two dimensional projection of customer segments.
+4. confusion_matrices.png: Side by side comparison of true versus predicted labels.
+5. roc_curves.png: Receiver Operating Characteristic curves comparing both models.
+6. feature_importance.png: Horizontal ranking of the top ten churn predictors.
+
+Users can embed these images directly as annotated figures in their technical report.
+
+6.6 Video Tutorial Demonstration Link
+
+In compliance with the Coursework 2 assessment brief requirement, a video demonstration has been recorded demonstrating the live execution, code architecture walkthrough, and results interpretation:
+Video Tutorial Link: [Insert Your Recorded Panopto or YouTube Video Link Here]
+Video Duration: Approximately 5 to 7 minutes covering code explanation, terminal execution, and visual output appraisal.

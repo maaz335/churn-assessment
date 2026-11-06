@@ -1,0 +1,39 @@
+Section 2: Dataset Acquisition and Feature Description
+
+2.1 Dataset Source and Characteristics
+
+The dataset utilized in this project is the widely recognized Telco Customer Churn dataset, obtained from the Kaggle machine learning repository and initially published by IBM. It contains real world historical customer records from a major telecommunications operator serving residential clients in North America.
+
+The raw dataset comprises 7043 individual customer observations with 21 attributes. Each record captures the demographic profile of the customer, the full portfolio of subscribed services, financial charges, contract parameters, and the ultimate churn status indicating whether the customer left the company within the preceding month.
+
+2.2 Feature Categorization and Breakdown
+
+The attributes present in the dataset can be structured into four distinct logical groups:
+
+Group 1: Customer Demographics
+1. gender: Categorical attribute indicating customer gender (Male or Female).
+2. SeniorCitizen: Binary indicator denoting whether the customer is an elderly citizen (1 for yes, 0 for no).
+3. Partner: Categorical variable recording whether the customer has a domestic partner (Yes or No).
+4. Dependents: Categorical variable indicating if the client has financial dependents (Yes or No).
+
+Group 2: Account and Billing Parameters
+1. tenure: Numerical integer representing the total number of months the customer has stayed with the company.
+2. Contract: Categorical variable defining the contract term length (Month to month, One year, or Two year).
+3. PaperlessBilling: Categorical variable indicating whether electronic invoicing is enabled (Yes or No).
+4. PaymentMethod: Categorical variable detailing payment channels (Electronic check, Mailed check, Bank transfer automatic, Credit card automatic).
+5. MonthlyCharges: Numerical continuous variable capturing the recurring monthly amount billed to the account.
+6. TotalCharges: Numerical continuous variable reflecting the cumulative financial charges accrued over the entire customer lifespan.
+
+Group 3: Telecommunications and Internet Services
+1. PhoneService: Whether the client subscribes to landline telephone service (Yes or No).
+2. MultipleLines: Whether the client has multiple telephone lines (Yes, No, No phone service).
+3. InternetService: Primary internet technology (DSL, Fiber optic, or No internet service).
+4. OnlineSecurity: Supplementary web security package (Yes, No, or No internet service).
+5. OnlineBackup: Cloud data backup facility (Yes, No, or No internet service).
+6. DeviceProtection: Hardware insurance plan (Yes, No, or No internet service).
+7. TechSupport: Priority technical support access (Yes, No, or No internet service).
+8. StreamingTV: Digital television streaming access (Yes, No, or No internet service).
+9. StreamingMovies: Movie on demand streaming package (Yes, No, or No internet service).
+
+Group 4: Target Variable
+1. Churn: The binary ground truth label indicating customer attrition (Yes if the customer cancelled service, No if the customer remained). In the raw dataset, 5174 customers are retained (73.46 percent) while 1869 customers churned (26.54 percent), presenting a realistic class imbalance.

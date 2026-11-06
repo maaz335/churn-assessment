@@ -1,0 +1,27 @@
+CMP6221 Computing for AI
+Assessment 2 User Guide Project Report
+Academic Year: 2026 2027
+
+Student Name: Abdullah Aijaz
+Student ID: [Student ID]
+Module Title: Computing for AI
+Module Code: CMP6221
+
+
+Section 1: Introduction and Case Study
+
+1.1 Background and Problem Statement
+
+Customer churn is one of the most critical operational challenges faced by modern telecommunication service providers. In the subscription based telecommunications sector, retaining existing customers is far more cost effective than acquiring new ones. Industry studies indicate that acquiring a new customer costs between five and twenty five times more than keeping an existing one satisfied. When a customer terminates their service contract or switches to a competitor, the provider loses not only recurring monthly subscription fees but also the initial capital invested in customer onboarding and hardware provision.
+
+The primary objective of this project is to develop an automated, data driven machine learning system capable of identifying customers who are at a high risk of churning before they actually cancel their subscriptions. Early identification enables the marketing, retention, and customer support departments to implement targeted interventions such as personalized loyalty discounts, tailored plan upgrades, or proactive technical assistance.
+
+1.2 Proposed AI Solution
+
+To address this real world business challenge, an end to end computing pipeline was engineered in Python using an Object Oriented Programming architecture. The proposed solution does not rely solely on simple supervised classification. Instead, it combines both unsupervised and supervised machine learning methodologies to achieve a dual objective:
+
+First, unsupervised learning algorithms are utilized for customer behavioral segmentation without relying on ground truth labels. K Means clustering groups customers into distinct behavioral personas based on their tenure, spending habits, and service adoption. Principal Component Analysis is then applied to project high dimensional feature representations into a two dimensional coordinate space for intuitive visual appraisal.
+
+Second, supervised learning algorithms are deployed to classify customer churn risk. A baseline Logistic Regression model is evaluated alongside an ensemble Random Forest Classifier. To maximize classification reliability, the Random Forest model undergoes structured hyperparameter tuning via GridSearchCV with cross validation.
+
+Finally, model performance is benchmarked using rigorous statistical metrics including classification accuracy, precision, recall, F1 score, ROC AUC curves, and confusion matrix analysis. The entire system is packaged with a dedicated integrity verification check to prevent data alteration and ensure code authenticity.

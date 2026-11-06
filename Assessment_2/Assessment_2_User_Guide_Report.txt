@@ -1,0 +1,382 @@
+CMP6221 Computing for AI
+Assessment 2 User Guide Project Report
+Academic Year: 2026 2027
+
+Student Name: Abdullah Aijaz
+Student ID: [Student ID]
+Module Title: Computing for AI
+Module Code: CMP6221
+
+
+Section 1: Introduction and Case Study
+
+1.1 Background and Problem Statement
+
+Customer churn is one of the most critical operational challenges faced by modern telecommunication service providers. In the subscription based telecommunications sector, retaining existing customers is far more cost effective than acquiring new ones. Industry studies indicate that acquiring a new customer costs between five and twenty five times more than keeping an existing one satisfied. When a customer terminates their service contract or switches to a competitor, the provider loses not only recurring monthly subscription fees but also the initial capital invested in customer onboarding and hardware provision.
+
+The primary objective of this project is to develop an automated, data driven machine learning system capable of identifying customers who are at a high risk of churning before they actually cancel their subscriptions. Early identification enables the marketing, retention, and customer support departments to implement targeted interventions such as personalized loyalty discounts, tailored plan upgrades, or proactive technical assistance.
+
+1.2 Proposed AI Solution
+
+To address this real world business challenge, an end to end computing pipeline was engineered in Python using an Object Oriented Programming architecture. The proposed solution does not rely solely on simple supervised classification. Instead, it combines both unsupervised and supervised machine learning methodologies to achieve a dual objective:
+
+First, unsupervised learning algorithms are utilized for customer behavioral segmentation without relying on ground truth labels. K Means clustering groups customers into distinct behavioral personas based on their tenure, spending habits, and service adoption. Principal Component Analysis is then applied to project high dimensional feature representations into a two dimensional coordinate space for intuitive visual appraisal.
+
+Second, supervised learning algorithms are deployed to classify customer churn risk. A baseline Logistic Regression model is evaluated alongside an ensemble Random Forest Classifier. To maximize classification reliability, the Random Forest model undergoes structured hyperparameter tuning via GridSearchCV with cross validation.
+
+Finally, model performance is benchmarked using rigorous statistical metrics including classification accuracy, precision, recall, F1 score, ROC AUC curves, and confusion matrix analysis. The entire system is packaged with a dedicated integrity verification check to prevent data alteration and ensure code authenticity.
+
+
+======================================================================
+
+Section 2: Dataset Acquisition and Feature Description
+
+2.1 Dataset Source and Characteristics
+
+The dataset utilized in this project is the widely recognized Telco Customer Churn dataset, obtained from the Kaggle machine learning repository and initially published by IBM. It contains real world historical customer records from a major telecommunications operator serving residential clients in North America.
+
+The raw dataset comprises 7043 individual customer observations with 21 attributes. Each record captures the demographic profile of the customer, the full portfolio of subscribed services, financial charges, contract parameters, and the ultimate churn status indicating whether the customer left the company within the preceding month.
+
+2.2 Feature Categorization and Breakdown
+
+The attributes present in the dataset can be structured into four distinct logical groups:
+
+Group 1: Customer Demographics
+1. gender: Categorical attribute indicating customer gender (Male or Female).
+2. SeniorCitizen: Binary indicator denoting whether the customer is an elderly citizen (1 for yes, 0 for no).
+3. Partner: Categorical variable recording whether the customer has a domestic partner (Yes or No).
+4. Dependents: Categorical variable indicating if the client has financial dependents (Yes or No).
+
+Group 2: Account and Billing Parameters
+1. tenure: Numerical integer representing the total number of months the customer has stayed with the company.
+2. Contract: Categorical variable defining the contract term length (Month to month, One year, or Two year).
+3. PaperlessBilling: Categorical variable indicating whether electronic invoicing is enabled (Yes or No).
+4. PaymentMethod: Categorical variable detailing payment channels (Electronic check, Mailed check, Bank transfer automatic, Credit card automatic).
+5. MonthlyCharges: Numerical continuous variable capturing the recurring monthly amount billed to the account.
+6. TotalCharges: Numerical continuous variable reflecting the cumulative financial charges accrued over the entire customer lifespan.
+
+Group 3: Telecommunications and Internet Services
+1. PhoneService: Whether the client subscribes to landline telephone service (Yes or No).
+2. MultipleLines: Whether the client has multiple telephone lines (Yes, No, No phone service).
+3. InternetService: Primary internet technology (DSL, Fiber optic, or No internet service).
+4. OnlineSecurity: Supplementary web security package (Yes, No, or No internet service).
+5. OnlineBackup: Cloud data backup facility (Yes, No, or No internet service).
+6. DeviceProtection: Hardware insurance plan (Yes, No, or No internet service).
+7. TechSupport: Priority technical support access (Yes, No, or No internet service).
+8. StreamingTV: Digital television streaming access (Yes, No, or No internet service).
+9. StreamingMovies: Movie on demand streaming package (Yes, No, or No internet service).
+
+Group 4: Target Variable
+1. Churn: The binary ground truth label indicating customer attrition (Yes if the customer cancelled service, No if the customer remained). In the raw dataset, 5174 customers are retained (73.46 percent) while 1869 customers churned (26.54 percent), presenting a realistic class imbalance.
+
+
+======================================================================
+
+Section 3: Data Preprocessing and Cleaning Methodology
+
+3.1 Elimination of Non Informative Data Artifacts
+
+Raw real world datasets often contain identifiers that do not possess any predictive power and can introduce artificial noise or overfitting if left in the feature matrix. In this project, the attribute customerID represents an arbitrary alphanumeric customer tracking token. The first preprocessing operation permanently drops customerID from the dataset, ensuring the downstream mathematical models only learn from genuine behavioral and commercial signals.
+
+3.2 Detection and Resolution of Missing Values
+
+Data quality inspection revealed a hidden missing data artifact within the TotalCharges column. While the column was loaded as an object text type, eleven records contained blank whitespace characters rather than valid financial figures. These occurrences corresponded to brand new customers with a tenure of zero months who had not yet received their first completed billing cycle.
+
+The pipeline applies a robust data cleaning procedure:
+First, all string values in TotalCharges are stripped of extraneous whitespace and converted into numeric floating point representations using error coercion, which translates blank fields into standard not a number values.
+Second, rather than discarding these eleven customer records and losing valid demographic data, median imputation is applied. The median value of 1397.47 is calculated from the remaining valid entries and populated into the blank records. The median was selected over the mean because cumulative financial data is right skewed and the median provides a far more resilient central tendency estimate.
+
+3.3 Target Variable Transformation
+
+The target attribute Churn is originally recorded as text strings (Yes and No). For algorithmic compatibility, the pipeline maps this binary column into integer values, where Yes becomes 1 (positive churn class) and No becomes 0 (negative retained class). A frequency verification confirmed 1869 churn instances and 5174 retained instances, and the target distribution was automatically plotted and saved as churn_distribution.png.
+
+3.4 Outlier Management via Interquartile Range
+
+Extreme numerical values can heavily distort distance based algorithms such as K Means, PCA, and Logistic Regression. To detect and control outliers without artificially truncating sample size, the pipeline executes the statistical Interquartile Range technique on all continuous variables: tenure, MonthlyCharges, and TotalCharges.
+
+For each continuous feature, the first quartile (25th percentile) and third quartile (75th percentile) are computed to establish the interquartile range. Upper and lower statistical boundaries are defined at 1.5 times the interquartile range beyond the respective quartiles. Any data point exceeding these boundaries is clipped to the boundary threshold rather than deleted. This ensures data consistency while removing extreme leveraged leverage points.
+
+3.5 Categorical Feature Encoding
+
+Machine learning estimators require purely numerical inputs. The dataset contains multiple categorical attributes, including binary categories (such as gender and Partner) and multi nominal categories (such as InternetService, Contract, and PaymentMethod).
+
+The pipeline implements One Hot Encoding across all categorical columns. To prevent multicollinearity and avoid the dummy variable trap, the first level of each category is discarded (drop_first=True). Following this transformation, the original 19 predictive variables are expanded into 30 purely numeric, independent feature vectors.
+
+3.6 Train Test Partitioning and Feature Standardization
+
+To prevent information leakage from the test dataset into the training phase, the encoded dataset is partitioned into an 80 percent training subset (5634 records) and a 20 percent testing subset (1409 records). Stratified sampling is enforced based on the target churn variable, ensuring both partitions maintain an identical 73.5 to 26.5 class proportion.
+
+Following the split, feature scaling is conducted using scikit learn StandardScaler. The standardizer shifts each feature distribution to have a mean of zero and a unit variance of one. Crucially, the scaler parameters are fitted strictly on the training set and subsequently applied to transform both the training and testing matrices, guaranteeing that zero test set distribution parameters influence training.
+
+
+======================================================================
+
+Section 4: Program Architecture and Object Oriented Design
+
+4.1 Architectural Overview and Design Principles
+
+The program is engineered strictly following Object Oriented Programming principles in Python. Instead of an unstructured procedural script, all operational logic, data state transformations, estimators, and graphical renderers are encapsulated within a central class named CustomerChurnPipeline.
+
+This architectural approach offers several distinct software engineering advantages:
+1. State Encapsulation: The raw dataframe, cleaned dataframe, training partitions, trained estimators, and evaluation dictionaries are held securely as private and instance attributes.
+2. Separation of Concerns: Distinct stages such as data loading, imputation, feature scaling, model fitting, and graph generation are divided into dedicated, modular class methods.
+3. Code Reusability and Maintainability: The pipeline can be instantiated multiple times with alternative datasets or parameter variations without refactoring core logic.
+4. Extensibility: Additional estimators, cross validation strategies, or preprocessing steps can be plugged in without destabilizing existing functionality.
+
+4.2 Detailed Class Method Documentation
+
+The CustomerChurnPipeline class encapsulates nine core methods:
+
+Method 1: init(self, data_path, output_dir)
+This is the constructor method responsible for initializing the pipeline instance. It accepts the file path to the raw dataset (defaulting to customer_churn.csv) and the destination directory for visual outputs (defaulting to outputs). It initializes internal state variables for raw_data, clean_data, training and testing splits, sets up the StandardScaler object, and verifies that the output folder exists on the operating system, automatically generating it if absent.
+
+Method 2: verify_data_integrity(self)
+This method reads the raw CSV file in binary mode and computes a cryptographic SHA 256 digest. This satisfies the university rubric requirement for protection against unauthorized alteration and data disclosure. The resulting 64 character hexadecimal hash serves as an immutable verification signature for the input dataset.
+
+Method 3: load_dataset(self)
+This method utilizes the pandas read_csv engine to load the tabular records into internal memory. It performs initial shape validation and logs row and column counts to the terminal.
+
+Method 4: explore_and_clean_data(self)
+This method executes the entire data cleansing lifecycle. It drops the customerID column, detects and imputes the 11 blank TotalCharges fields using the median value of 1397.47, maps the Churn target to binary integers, applies IQR outlier bounding across continuous attributes, and exports the churn_distribution.png visualization.
+
+Method 5: prepare_features(self)
+This method isolates the target series from the predictor matrix, applies One Hot Encoding across all categorical columns with drop_first enabled, performs stratified 80 to 20 train test splitting, and executes standard feature normalization via StandardScaler.
+
+Method 6: run_unsupervised_models(self)
+This method coordinates the unsupervised machine learning phase. It iterates through cluster counts from k equals 2 to 6, calculating both sum of squared distances (inertia) and silhouette coefficients to generate kmeans_evaluation.png. It then fits the optimal K Means model with k equals 3, segments the training records, and applies Principal Component Analysis to reduce the 30 features into 2 orthogonal dimensions, exporting pca_customer_clusters.png.
+
+Method 7: train_supervised_models(self)
+This method trains the supervised classification models. It instantiates and fits a baseline Logistic Regression estimator with a maximum iteration cap of 1000. Next, it configures a comprehensive hyperparameter search grid for the Random Forest Classifier, evaluating combinations of n_estimators (50, 100, 150), max_depth (6, 10, None), and min_samples_split (2, 5) using 3 fold cross validation scored on the F1 metric. The optimal estimator is saved into the trained_models dictionary.
+
+Method 8: evaluate_models(self)
+This method assesses all fitted supervised estimators against the unseen 20 percent test partition. It generates binary predictions and continuous probability scores, computing Accuracy, Precision, Recall, F1 Score, and ROC AUC. It automatically generates side by side confusion matrices, ROC curve comparisons, and a horizontal bar chart of the top ten Random Forest feature importances, saving confusion_matrices.png, roc_curves.png, and feature_importance.png.
+
+Method 9: run_full_pipeline(self)
+This is the master coordinator method that executes each of the aforementioned methods in their strict sequential dependency order, printing user friendly console progress updates at each milestone.
+
+4.3 System Connectivity and Input Output Flow
+
+The input to the system is a single CSV file: customer_churn.csv.
+The system processes this input entirely in memory using vectorized numpy and pandas operations.
+The outputs produced by the program include:
+1. High resolution visual artifacts stored in the outputs directory (churn_distribution.png, kmeans_evaluation.png, pca_customer_clusters.png, confusion_matrices.png, roc_curves.png, feature_importance.png).
+2. Structured console logs detailing each pipeline step, hyperparameter outputs, and a tabular benchmarking summary.
+
+
+======================================================================
+
+Section 5: Machine Learning Algorithms and Mathematical Foundations
+
+5.1 Unsupervised Algorithm 1: K Means Clustering
+
+K Means is an iterative unsupervised partitioning algorithm that divides an unlabelled feature space into k distinct, non overlapping clusters. The fundamental mathematical objective of K Means is to minimize the within cluster sum of squares, also known as inertia.
+
+Inertia is calculated by summing the squared Euclidean distances between each individual customer feature vector and the centroid of their assigned cluster. The algorithm operates in two iterative steps:
+1. Assignment Step: Each customer vector is assigned to the nearest cluster centroid based on Euclidean distance.
+2. Update Step: Each cluster centroid is recalculated as the arithmetic mean of all customer vectors currently assigned to that cluster.
+This process iterates until the centroids stabilize or the maximum iteration threshold is achieved.
+
+To determine the mathematically sound number of clusters k, the pipeline evaluates cluster counts from k equals 2 to k equals 6 using two complementary diagnostic metrics:
+The Elbow Method plots inertia against increasing values of k. As k increases, inertia naturally decreases; the goal is to identify an inflection point or elbow where additional clusters yield diminishing returns in inertia reduction.
+The Silhouette Score measures how similar a customer data point is to its own assigned cluster compared to neighboring clusters. Silhouette values range from negative one to positive one, where values closer to positive one indicate well isolated, coherent clusters.
+
+Based on joint appraisal of the elbow curve and silhouette coefficients in kmeans_evaluation.png, k equals 3 was selected as the optimal cluster count. The three discovered customer personas are:
+Cluster 0 (21.5 percent of customers): Long term loyal customers with high tenure, multi year contracts, and high adoption of bundled internet and security services.
+Cluster 1 (44.2 percent of customers): Budget conscious customers subscribing primarily to basic telephone or entry level DSL services with low monthly charges and moderate churn risk.
+Cluster 2 (34.2 percent of customers): High churn risk, short tenure customers enrolled on month to month contracts with high monthly charges and fiber optic subscriptions.
+
+5.2 Unsupervised Algorithm 2: Principal Component Analysis (PCA)
+
+Principal Component Analysis is an orthogonal linear transformation technique widely used for unsupervised dimensionality reduction, feature decorrelation, and visualization. High dimensional datasets frequently suffer from the curse of dimensionality, where spatial sparsity and collinearity impair visual interpretation and model convergence.
+
+PCA identifies the principal axes of maximal variance across the standardized 30 feature space. Mathematically, it computes the covariance matrix of the scaled predictors, calculates its eigenvectors and eigenvalues, and projects the data onto the eigenvectors associated with the largest eigenvalues.
+
+In our pipeline, PCA reduces the 30 encoded dimensions into 2 primary orthogonal components:
+Principal Component 1 captures 33.2 percent of total system variance, representing overall account maturity, service bundling, and financial scale.
+Principal Component 2 captures 12.0 percent of total variance, reflecting contract stability and payment method preferences.
+Together, the two components capture over 45 percent of the information contained across all 30 features, providing a coherent two dimensional map in pca_customer_clusters.png that visually demonstrates how well K Means separates customer behavioral archetypes.
+
+5.3 Supervised Algorithm 1: Logistic Regression
+
+Logistic Regression serves as the foundational linear benchmark for the binary churn prediction task. Unlike linear regression, which predicts unbounded continuous values, Logistic Regression applies the non linear sigmoid activation function to map linear combinations of feature weights into bounded probabilities between 0 and 1.
+
+Mathematically, the sigmoid function transforms the linear log odds into a posterior probability:
+Probability(Churn = 1 | X) = 1 / (1 + exp(-z)), where z is the dot product of feature weights and customer attributes plus an intercept term.
+The model is trained using maximum likelihood estimation with L2 Ridge regularization, which penalizes excessively large coefficients and prevents overfitting on correlated features. If the estimated probability equals or exceeds 0.50, the customer is predicted to churn; otherwise, the customer is classified as retained.
+
+5.4 Supervised Algorithm 2: Random Forest Classifier
+
+The Random Forest Classifier is an ensemble learning algorithm that constructs a multitude of decorrelated decision trees during training and outputs the majority class vote across the forest.
+
+The algorithm relies on two layers of randomness:
+1. Bootstrap Aggregating (Bagging): Each individual decision tree in the forest is trained on an independently sampled bootstrap subset of the training records, drawn with replacement.
+2. Random Feature Subspace Selection: At each candidate split node within a tree, only a random subset of features is evaluated rather than the entire feature matrix. This ensures individual trees are decorrelated and do not all rely on the single most dominant predictor.
+
+To achieve superior predictive performance and fulfill the high distinction assessment criteria, the Random Forest model is optimized using GridSearchCV across three key hyperparameters:
+1. n_estimators (evaluated at 50, 100, and 150): The number of decision trees in the ensemble.
+2. max_depth (evaluated at 6, 10, and None): The maximum allowable tree depth, controlling tree complexity and guarding against overfitting.
+3. min_samples_split (evaluated at 2 and 5): The minimum number of samples required to trigger a node split.
+
+GridSearchCV executes 3 fold cross validation across all 18 parameter permutations, optimizing directly for the F1 score. The best hyperparameter combination identified was max_depth equals 10, min_samples_split equals 5, and n_estimators equals 50, delivering optimal balance between model capacity and generalization.
+
+
+======================================================================
+
+Section 6: Step by Step User Guide and Operational Manual
+
+6.1 System Prerequisites and Installation
+
+To successfully execute the Customer Churn AI system, the host environment must meet the following technical specifications:
+1. Python Runtime: Python version 3.10, 3.11, or 3.12 installed on Windows, macOS, or Linux.
+2. Required Python Libraries: The software relies upon five standard open source scientific computing libraries:
+   pandas: for tabular dataset ingestion and data wrangling
+   numpy: for numerical array manipulation and statistical bounding
+   scikit learn: for preprocessing, clustering, estimators, and metrics
+   matplotlib: for core graphical rendering and layout generation
+   seaborn: for advanced statistical visualization styling
+
+To install all required dependencies in a single terminal command, open a command prompt or terminal window and enter:
+pip install numpy pandas scikit learn matplotlib seaborn
+
+6.2 Directory Structure Configuration
+
+Ensure that all project files reside in the same working directory. The directory layout should appear as follows:
+Project Directory
+  customer_churn.csv (Raw dataset file)
+  customer_churn_pipeline.py (Main application program)
+  customer_churn_notebook.ipynb (Jupyter Notebook interface)
+  outputs (Destination folder automatically created for graphics)
+
+6.3 Execution via Command Line Interface (CLI)
+
+The primary method for executing the full computing pipeline is via the terminal:
+Step 1: Open the command prompt or terminal application.
+Step 2: Navigate to the directory containing customer_churn_pipeline.py.
+Step 3: Execute the script by typing:
+python customer_churn_pipeline.py
+
+Step 4: Observe the real time execution progress printed to the console:
+The script first logs the SHA 256 data integrity checksum.
+Step 1 confirms dataset loading (7043 rows, 21 columns).
+Step 2 confirms data cleaning, dropping customerID, and median imputation of 11 TotalCharges records.
+Step 3 displays feature transformation to 30 encoded columns and train test splitting.
+Step 4 logs K Means cluster percentages and PCA explained variance ratios.
+Step 5 displays the best hyperparameters found by GridSearchCV.
+Step 6 prints the full classification report and model benchmarking table.
+
+Execution takes approximately 10 to 15 seconds on a modern computer.
+
+6.4 Execution via Jupyter Notebook or Google Colab
+
+Users who prefer an interactive environment can utilize customer_churn_notebook.ipynb:
+Step 1: Launch Jupyter Notebook, JupyterLab, Visual Studio Code, or Google Colab.
+Step 2: Open customer_churn_notebook.ipynb.
+Step 3: Ensure customer_churn.csv is present in the working environment.
+Step 4: Execute the cells sequentially. Cell 1 executes the complete pipeline, and Cell 2 automatically displays all six generated figures inline within the notebook interface.
+
+6.5 Accessing and Utilizing Output Artifacts
+
+Upon completion, all generated visualization charts are stored inside the outputs folder:
+1. churn_distribution.png: Visual evidence of class distribution.
+2. kmeans_evaluation.png: Dual plot of Elbow inertia curve and Silhouette score curve.
+3. pca_customer_clusters.png: Two dimensional projection of customer segments.
+4. confusion_matrices.png: Side by side comparison of true versus predicted labels.
+5. roc_curves.png: Receiver Operating Characteristic curves comparing both models.
+6. feature_importance.png: Horizontal ranking of the top ten churn predictors.
+
+Users can embed these images directly as annotated figures in their technical report.
+
+6.6 Video Tutorial Demonstration Link
+
+In compliance with the Coursework 2 assessment brief requirement, a video demonstration has been recorded demonstrating the live execution, code architecture walkthrough, and results interpretation:
+Video Tutorial Link: [Insert Your Recorded Panopto or YouTube Video Link Here]
+Video Duration: Approximately 5 to 7 minutes covering code explanation, terminal execution, and visual output appraisal.
+
+
+======================================================================
+
+Section 7: Benchmarking, Results Discussion, and Critical Appraisal
+
+7.1 Quantitative Performance Comparison
+
+The performance of both supervised machine learning algorithms was rigorously appraised on the unseen 20 percent test partition comprising 1409 customer observations. Because the churn dataset possesses an imbalanced target distribution (roughly 73.5 percent retained to 26.5 percent churned), raw classification accuracy alone is an inadequate measure of model quality. A naive baseline predicting that no customer ever churns would achieve an artificial 73.5 percent accuracy while failing completely at identifying churn risk.
+
+Accordingly, the models were evaluated across five standardized performance metrics:
+
+Metric 1: Classification Accuracy
+Logistic Regression achieved 80.70 percent overall accuracy.
+Random Forest achieved 79.63 percent overall accuracy.
+
+Metric 2: Precision (Positive Predictive Value)
+Precision reflects the percentage of customers flagged as churners who actually terminated service.
+Logistic Regression achieved 65.84 percent precision.
+Random Forest achieved 64.65 percent precision.
+
+Metric 3: Recall (Sensitivity or True Positive Rate)
+Recall measures the proportion of actual churners successfully detected by the system.
+Logistic Regression achieved 56.68 percent recall (detecting 212 out of 374 churners).
+Random Forest achieved 51.34 percent recall (detecting 192 out of 374 churners).
+
+Metric 4: F1 Score (Harmonic Mean of Precision and Recall)
+The F1 score provides the most balanced metric for imbalanced classification scenarios.
+Logistic Regression achieved an F1 score of 60.92 percent.
+Random Forest achieved an F1 score of 57.23 percent.
+
+Metric 5: Area Under the Receiver Operating Characteristic Curve (ROC AUC)
+ROC AUC reflects the probability that the classifier ranks a randomly chosen positive churn instance higher than a randomly chosen negative retained instance across all possible classification decision thresholds.
+Logistic Regression achieved an exceptional ROC AUC of 84.16 percent.
+Random Forest achieved an ROC AUC of 83.91 percent.
+
+7.2 Confusion Matrix and Diagnostic Analysis
+
+The confusion matrix visualization in confusion_matrices.png provides granular insight into model trade offs:
+
+Logistic Regression correctly classified 925 retained customers (True Negatives) and 212 churning customers (True Positives). It misclassified 110 retained customers as churners (False Positives) and missed 162 actual churners (False Negatives).
+
+Random Forest correctly classified 930 retained customers (True Negatives) and 192 churning customers (True Positives). It produced 105 False Positives and 182 False Negatives.
+
+From a practical business standpoint, False Negatives (failing to identify a departing customer) are far more costly than False Positives (offering a retention discount to a loyal customer). In this respect, Logistic Regression proves superior due to its higher recall (56.68 percent versus 51.34 percent) and higher F1 score (60.92 percent versus 57.23 percent).
+
+7.3 Feature Importance and Business Insights
+
+The Random Forest feature importance analysis displayed in feature_importance.png reveals the core commercial drivers behind customer attrition. The top five most influential attributes are:
+
+1. TotalCharges and tenure: These attributes reflect the depth and longevity of the customer relationship. Customers in their first 6 to 12 months exhibit the highest vulnerability to churn, whereas customers who surpass 24 months of tenure demonstrate strong brand loyalty.
+2. MonthlyCharges: Customers with high monthly recurring bills are significantly more sensitive to competitive price offerings.
+3. Contract type (Month to month): Customers without long term contractual commitments exhibit churn rates nearly four times higher than customers on one year or two year agreements.
+4. InternetService (Fiber optic): Customers on fiber optic plans experienced higher churn, which investigation suggests may be linked to technical teething issues or higher price points.
+5. PaymentMethod (Electronic check): Customers paying via manual electronic checks displayed substantially higher churn rates compared to those on automated bank debit or credit card billing.
+
+7.4 Strategic Business Recommendations
+
+Based on empirical model outputs and unsupervised cluster profiling:
+1. Targeted Early Lifecycle Interventions: Telecommunication managers should concentrate onboarding resources on new customers during months 1 through 6, offering proactive satisfaction surveys and loyalty credits.
+2. Migration to Fixed Term Contracts: Marketing incentives, such as discounted streaming bundles, should be offered to encourage month to month subscribers to transition to one year commitments.
+3. Automated Payment Incentivization: Offering a nominal monthly bill credit (such as two dollars) for enabling automated bank deductions will reduce friction and payment related churn.
+
+
+======================================================================
+
+Section 8: Academic References
+
+Breiman, L., 2001. Random forests. Machine Learning, 45(1), pp.5 32.
+
+Hastie, T., Tibshirani, R. and Friedman, J., 2009. The Elements of Statistical Learning: Data Mining, Inference, and Prediction. 2nd ed. New York: Springer.
+
+Hosmer, D.W., Lemeshow, S. and Sturdivant, R.X., 2013. Applied Logistic Regression. 3rd ed. Hoboken: John Wiley and Sons.
+
+IBM Corporation, 2021. Telco Customer Churn Dataset. Available at Kaggle: https://www.kaggle.com/datasets/blastchar/telco customer churn [Accessed 17 October 2026].
+
+Jolliffe, I.T. and Cadima, J., 2016. Principal component analysis: a review and recent developments. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 374(2065), p.20150202.
+
+MacQueen, J., 1967. Some methods for classification and analysis of multivariate observations. In: Proceedings of the Fifth Berkeley Symposium on Mathematical Statistics and Probability. Berkeley: University of California Press, pp.281 297.
+
+McKinney, W., 2010. Data structures for statistical computing in Python. In: Proceedings of the 9th Python in Science Conference. Austin: SciPy, pp.51 56.
+
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V. and Vanderplas, J., 2011. Scikit learn: Machine learning in Python. Journal of Machine Learning Research, 12, pp.2825 2830.
+
+Rousseeuw, P.J., 1987. Silhouettes: a graphical aid to the interpretation and validation of cluster analysis. Journal of Computational and Applied Mathematics, 20, pp.53 65.
+
+
+======================================================================
+

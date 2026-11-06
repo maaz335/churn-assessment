@@ -1,0 +1,52 @@
+{
+  "supervised_models": {
+    "Logistic Regression": {
+      "Accuracy": 0.8055358410220014,
+      "Precision": 0.6582278481012658,
+      "Recall": 0.5561497326203209,
+      "F1 Score": 0.6028985507246376,
+      "ROC AUC": 0.8420109018574492
+    },
+    "Random Forest": {
+      "Accuracy": 0.7984386089425124,
+      "Precision": 0.65,
+      "Recall": 0.5213903743315508,
+      "F1 Score": 0.5786350148367952,
+      "ROC AUC": 0.8401237438321838
+    }
+  },
+  "unsupervised_models": {
+    "candidate_k": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "inertias": [
+      33486.967780473315,
+      24643.27764861731,
+      22600.64132757206,
+      21180.009580718757,
+      19985.78334132139
+    ],
+    "silhouette_scores": [
+      0.29520256785646914,
+      0.2833339780375879,
+      0.22748452405163064,
+      0.20622606358730314,
+      0.18195056237951893
+    ],
+    "selected_k": 2,
+    "selected_silhouette_score": 0.29520256785646914,
+    "selection_rationale": "Selected k=2 by maximizing Silhouette Score (0.2952). Note: k=3 also represents an elbow inflection point with inertia drop of 8843.7.",
+    "cluster_distribution": {
+      "0": 1214,
+      "1": 4420
+    },
+    "pca_explained_variance_ratio": [
+      0.3936197188682359,
+      0.1850304826274968
+    ]
+  }
+}

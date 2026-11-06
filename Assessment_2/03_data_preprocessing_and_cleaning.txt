@@ -1,0 +1,35 @@
+Section 3: Data Preprocessing and Cleaning Methodology
+
+3.1 Elimination of Non Informative Data Artifacts
+
+Raw real world datasets often contain identifiers that do not possess any predictive power and can introduce artificial noise or overfitting if left in the feature matrix. In this project, the attribute customerID represents an arbitrary alphanumeric customer tracking token. The first preprocessing operation permanently drops customerID from the dataset, ensuring the downstream mathematical models only learn from genuine behavioral and commercial signals.
+
+3.2 Detection and Resolution of Missing Values
+
+Data quality inspection revealed a hidden missing data artifact within the TotalCharges column. While the column was loaded as an object text type, eleven records contained blank whitespace characters rather than valid financial figures. These occurrences corresponded to brand new customers with a tenure of zero months who had not yet received their first completed billing cycle.
+
+The pipeline applies a robust data cleaning procedure:
+First, all string values in TotalCharges are stripped of extraneous whitespace and converted into numeric floating point representations using error coercion, which translates blank fields into standard not a number values.
+Second, rather than discarding these eleven customer records and losing valid demographic data, median imputation is applied. The median value of 1397.47 is calculated from the remaining valid entries and populated into the blank records. The median was selected over the mean because cumulative financial data is right skewed and the median provides a far more resilient central tendency estimate.
+
+3.3 Target Variable Transformation
+
+The target attribute Churn is originally recorded as text strings (Yes and No). For algorithmic compatibility, the pipeline maps this binary column into integer values, where Yes becomes 1 (positive churn class) and No becomes 0 (negative retained class). A frequency verification confirmed 1869 churn instances and 5174 retained instances, and the target distribution was automatically plotted and saved as churn_distribution.png.
+
+3.4 Outlier Management via Interquartile Range
+
+Extreme numerical values can heavily distort distance based algorithms such as K Means, PCA, and Logistic Regression. To detect and control outliers without artificially truncating sample size, the pipeline executes the statistical Interquartile Range technique on all continuous variables: tenure, MonthlyCharges, and TotalCharges.
+
+For each continuous feature, the first quartile (25th percentile) and third quartile (75th percentile) are computed to establish the interquartile range. Upper and lower statistical boundaries are defined at 1.5 times the interquartile range beyond the respective quartiles. Any data point exceeding these boundaries is clipped to the boundary threshold rather than deleted. This ensures data consistency while removing extreme leveraged leverage points.
+
+3.5 Categorical Feature Encoding
+
+Machine learning estimators require purely numerical inputs. The dataset contains multiple categorical attributes, including binary categories (such as gender and Partner) and multi nominal categories (such as InternetService, Contract, and PaymentMethod).
+
+The pipeline implements One Hot Encoding across all categorical columns. To prevent multicollinearity and avoid the dummy variable trap, the first level of each category is discarded (drop_first=True). Following this transformation, the original 19 predictive variables are expanded into 30 purely numeric, independent feature vectors.
+
+3.6 Train Test Partitioning and Feature Standardization
+
+To prevent information leakage from the test dataset into the training phase, the encoded dataset is partitioned into an 80 percent training subset (5634 records) and a 20 percent testing subset (1409 records). Stratified sampling is enforced based on the target churn variable, ensuring both partitions maintain an identical 73.5 to 26.5 class proportion.
+
+Following the split, feature scaling is conducted using scikit learn StandardScaler. The standardizer shifts each feature distribution to have a mean of zero and a unit variance of one. Crucially, the scaler parameters are fitted strictly on the training set and subsequently applied to transform both the training and testing matrices, guaranteeing that zero test set distribution parameters influence training.

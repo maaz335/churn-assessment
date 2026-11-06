@@ -1,0 +1,53 @@
+Section 5: Machine Learning Algorithms and Mathematical Foundations
+
+5.1 Unsupervised Algorithm 1: K Means Clustering
+
+K Means is an iterative unsupervised partitioning algorithm that divides an unlabelled feature space into k distinct, non overlapping clusters. The fundamental mathematical objective of K Means is to minimize the within cluster sum of squares, also known as inertia.
+
+Inertia is calculated by summing the squared Euclidean distances between each individual customer feature vector and the centroid of their assigned cluster. The algorithm operates in two iterative steps:
+1. Assignment Step: Each customer vector is assigned to the nearest cluster centroid based on Euclidean distance.
+2. Update Step: Each cluster centroid is recalculated as the arithmetic mean of all customer vectors currently assigned to that cluster.
+This process iterates until the centroids stabilize or the maximum iteration threshold is achieved.
+
+To determine the mathematically sound number of clusters k, the pipeline evaluates cluster counts from k equals 2 to k equals 6 using two complementary diagnostic metrics:
+The Elbow Method plots inertia against increasing values of k. As k increases, inertia naturally decreases; the goal is to identify an inflection point or elbow where additional clusters yield diminishing returns in inertia reduction.
+The Silhouette Score measures how similar a customer data point is to its own assigned cluster compared to neighboring clusters. Silhouette values range from negative one to positive one, where values closer to positive one indicate well isolated, coherent clusters.
+
+Based on joint appraisal of the elbow curve and silhouette coefficients in kmeans_evaluation.png, k equals 3 was selected as the optimal cluster count. The three discovered customer personas are:
+Cluster 0 (21.5 percent of customers): Long term loyal customers with high tenure, multi year contracts, and high adoption of bundled internet and security services.
+Cluster 1 (44.2 percent of customers): Budget conscious customers subscribing primarily to basic telephone or entry level DSL services with low monthly charges and moderate churn risk.
+Cluster 2 (34.2 percent of customers): High churn risk, short tenure customers enrolled on month to month contracts with high monthly charges and fiber optic subscriptions.
+
+5.2 Unsupervised Algorithm 2: Principal Component Analysis (PCA)
+
+Principal Component Analysis is an orthogonal linear transformation technique widely used for unsupervised dimensionality reduction, feature decorrelation, and visualization. High dimensional datasets frequently suffer from the curse of dimensionality, where spatial sparsity and collinearity impair visual interpretation and model convergence.
+
+PCA identifies the principal axes of maximal variance across the standardized 30 feature space. Mathematically, it computes the covariance matrix of the scaled predictors, calculates its eigenvectors and eigenvalues, and projects the data onto the eigenvectors associated with the largest eigenvalues.
+
+In our pipeline, PCA reduces the 30 encoded dimensions into 2 primary orthogonal components:
+Principal Component 1 captures 33.2 percent of total system variance, representing overall account maturity, service bundling, and financial scale.
+Principal Component 2 captures 12.0 percent of total variance, reflecting contract stability and payment method preferences.
+Together, the two components capture over 45 percent of the information contained across all 30 features, providing a coherent two dimensional map in pca_customer_clusters.png that visually demonstrates how well K Means separates customer behavioral archetypes.
+
+5.3 Supervised Algorithm 1: Logistic Regression
+
+Logistic Regression serves as the foundational linear benchmark for the binary churn prediction task. Unlike linear regression, which predicts unbounded continuous values, Logistic Regression applies the non linear sigmoid activation function to map linear combinations of feature weights into bounded probabilities between 0 and 1.
+
+Mathematically, the sigmoid function transforms the linear log odds into a posterior probability:
+Probability(Churn = 1 | X) = 1 / (1 + exp(-z)), where z is the dot product of feature weights and customer attributes plus an intercept term.
+The model is trained using maximum likelihood estimation with L2 Ridge regularization, which penalizes excessively large coefficients and prevents overfitting on correlated features. If the estimated probability equals or exceeds 0.50, the customer is predicted to churn; otherwise, the customer is classified as retained.
+
+5.4 Supervised Algorithm 2: Random Forest Classifier
+
+The Random Forest Classifier is an ensemble learning algorithm that constructs a multitude of decorrelated decision trees during training and outputs the majority class vote across the forest.
+
+The algorithm relies on two layers of randomness:
+1. Bootstrap Aggregating (Bagging): Each individual decision tree in the forest is trained on an independently sampled bootstrap subset of the training records, drawn with replacement.
+2. Random Feature Subspace Selection: At each candidate split node within a tree, only a random subset of features is evaluated rather than the entire feature matrix. This ensures individual trees are decorrelated and do not all rely on the single most dominant predictor.
+
+To achieve superior predictive performance and fulfill the high distinction assessment criteria, the Random Forest model is optimized using GridSearchCV across three key hyperparameters:
+1. n_estimators (evaluated at 50, 100, and 150): The number of decision trees in the ensemble.
+2. max_depth (evaluated at 6, 10, and None): The maximum allowable tree depth, controlling tree complexity and guarding against overfitting.
+3. min_samples_split (evaluated at 2 and 5): The minimum number of samples required to trigger a node split.
+
+GridSearchCV executes 3 fold cross validation across all 18 parameter permutations, optimizing directly for the F1 score. The best hyperparameter combination identified was max_depth equals 10, min_samples_split equals 5, and n_estimators equals 50, delivering optimal balance between model capacity and generalization.

@@ -1,0 +1,58 @@
+Section 7: Benchmarking, Results Discussion, and Critical Appraisal
+
+7.1 Quantitative Performance Comparison
+
+The performance of both supervised machine learning algorithms was rigorously appraised on the unseen 20 percent test partition comprising 1409 customer observations. Because the churn dataset possesses an imbalanced target distribution (roughly 73.5 percent retained to 26.5 percent churned), raw classification accuracy alone is an inadequate measure of model quality. A naive baseline predicting that no customer ever churns would achieve an artificial 73.5 percent accuracy while failing completely at identifying churn risk.
+
+Accordingly, the models were evaluated across five standardized performance metrics:
+
+Metric 1: Classification Accuracy
+Logistic Regression achieved 80.70 percent overall accuracy.
+Random Forest achieved 79.63 percent overall accuracy.
+
+Metric 2: Precision (Positive Predictive Value)
+Precision reflects the percentage of customers flagged as churners who actually terminated service.
+Logistic Regression achieved 65.84 percent precision.
+Random Forest achieved 64.65 percent precision.
+
+Metric 3: Recall (Sensitivity or True Positive Rate)
+Recall measures the proportion of actual churners successfully detected by the system.
+Logistic Regression achieved 56.68 percent recall (detecting 212 out of 374 churners).
+Random Forest achieved 51.34 percent recall (detecting 192 out of 374 churners).
+
+Metric 4: F1 Score (Harmonic Mean of Precision and Recall)
+The F1 score provides the most balanced metric for imbalanced classification scenarios.
+Logistic Regression achieved an F1 score of 60.92 percent.
+Random Forest achieved an F1 score of 57.23 percent.
+
+Metric 5: Area Under the Receiver Operating Characteristic Curve (ROC AUC)
+ROC AUC reflects the probability that the classifier ranks a randomly chosen positive churn instance higher than a randomly chosen negative retained instance across all possible classification decision thresholds.
+Logistic Regression achieved an exceptional ROC AUC of 84.16 percent.
+Random Forest achieved an ROC AUC of 83.91 percent.
+
+7.2 Confusion Matrix and Diagnostic Analysis
+
+The confusion matrix visualization in confusion_matrices.png provides granular insight into model trade offs:
+
+Logistic Regression correctly classified 925 retained customers (True Negatives) and 212 churning customers (True Positives). It misclassified 110 retained customers as churners (False Positives) and missed 162 actual churners (False Negatives).
+
+Random Forest correctly classified 930 retained customers (True Negatives) and 192 churning customers (True Positives). It produced 105 False Positives and 182 False Negatives.
+
+From a practical business standpoint, False Negatives (failing to identify a departing customer) are far more costly than False Positives (offering a retention discount to a loyal customer). In this respect, Logistic Regression proves superior due to its higher recall (56.68 percent versus 51.34 percent) and higher F1 score (60.92 percent versus 57.23 percent).
+
+7.3 Feature Importance and Business Insights
+
+The Random Forest feature importance analysis displayed in feature_importance.png reveals the core commercial drivers behind customer attrition. The top five most influential attributes are:
+
+1. TotalCharges and tenure: These attributes reflect the depth and longevity of the customer relationship. Customers in their first 6 to 12 months exhibit the highest vulnerability to churn, whereas customers who surpass 24 months of tenure demonstrate strong brand loyalty.
+2. MonthlyCharges: Customers with high monthly recurring bills are significantly more sensitive to competitive price offerings.
+3. Contract type (Month to month): Customers without long term contractual commitments exhibit churn rates nearly four times higher than customers on one year or two year agreements.
+4. InternetService (Fiber optic): Customers on fiber optic plans experienced higher churn, which investigation suggests may be linked to technical teething issues or higher price points.
+5. PaymentMethod (Electronic check): Customers paying via manual electronic checks displayed substantially higher churn rates compared to those on automated bank debit or credit card billing.
+
+7.4 Strategic Business Recommendations
+
+Based on empirical model outputs and unsupervised cluster profiling:
+1. Targeted Early Lifecycle Interventions: Telecommunication managers should concentrate onboarding resources on new customers during months 1 through 6, offering proactive satisfaction surveys and loyalty credits.
+2. Migration to Fixed Term Contracts: Marketing incentives, such as discounted streaming bundles, should be offered to encourage month to month subscribers to transition to one year commitments.
+3. Automated Payment Incentivization: Offering a nominal monthly bill credit (such as two dollars) for enabling automated bank deductions will reduce friction and payment related churn.

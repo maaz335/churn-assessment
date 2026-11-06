@@ -1,0 +1,50 @@
+Section 4: Program Architecture and Object Oriented Design
+
+4.1 Architectural Overview and Design Principles
+
+The program is engineered strictly following Object Oriented Programming principles in Python. Instead of an unstructured procedural script, all operational logic, data state transformations, estimators, and graphical renderers are encapsulated within a central class named CustomerChurnPipeline.
+
+This architectural approach offers several distinct software engineering advantages:
+1. State Encapsulation: The raw dataframe, cleaned dataframe, training partitions, trained estimators, and evaluation dictionaries are held securely as private and instance attributes.
+2. Separation of Concerns: Distinct stages such as data loading, imputation, feature scaling, model fitting, and graph generation are divided into dedicated, modular class methods.
+3. Code Reusability and Maintainability: The pipeline can be instantiated multiple times with alternative datasets or parameter variations without refactoring core logic.
+4. Extensibility: Additional estimators, cross validation strategies, or preprocessing steps can be plugged in without destabilizing existing functionality.
+
+4.2 Detailed Class Method Documentation
+
+The CustomerChurnPipeline class encapsulates nine core methods:
+
+Method 1: init(self, data_path, output_dir)
+This is the constructor method responsible for initializing the pipeline instance. It accepts the file path to the raw dataset (defaulting to customer_churn.csv) and the destination directory for visual outputs (defaulting to outputs). It initializes internal state variables for raw_data, clean_data, training and testing splits, sets up the StandardScaler object, and verifies that the output folder exists on the operating system, automatically generating it if absent.
+
+Method 2: verify_data_integrity(self)
+This method reads the raw CSV file in binary mode and computes a cryptographic SHA 256 digest. This satisfies the university rubric requirement for protection against unauthorized alteration and data disclosure. The resulting 64 character hexadecimal hash serves as an immutable verification signature for the input dataset.
+
+Method 3: load_dataset(self)
+This method utilizes the pandas read_csv engine to load the tabular records into internal memory. It performs initial shape validation and logs row and column counts to the terminal.
+
+Method 4: explore_and_clean_data(self)
+This method executes the entire data cleansing lifecycle. It drops the customerID column, detects and imputes the 11 blank TotalCharges fields using the median value of 1397.47, maps the Churn target to binary integers, applies IQR outlier bounding across continuous attributes, and exports the churn_distribution.png visualization.
+
+Method 5: prepare_features(self)
+This method isolates the target series from the predictor matrix, applies One Hot Encoding across all categorical columns with drop_first enabled, performs stratified 80 to 20 train test splitting, and executes standard feature normalization via StandardScaler.
+
+Method 6: run_unsupervised_models(self)
+This method coordinates the unsupervised machine learning phase. It iterates through cluster counts from k equals 2 to 6, calculating both sum of squared distances (inertia) and silhouette coefficients to generate kmeans_evaluation.png. It then fits the optimal K Means model with k equals 3, segments the training records, and applies Principal Component Analysis to reduce the 30 features into 2 orthogonal dimensions, exporting pca_customer_clusters.png.
+
+Method 7: train_supervised_models(self)
+This method trains the supervised classification models. It instantiates and fits a baseline Logistic Regression estimator with a maximum iteration cap of 1000. Next, it configures a comprehensive hyperparameter search grid for the Random Forest Classifier, evaluating combinations of n_estimators (50, 100, 150), max_depth (6, 10, None), and min_samples_split (2, 5) using 3 fold cross validation scored on the F1 metric. The optimal estimator is saved into the trained_models dictionary.
+
+Method 8: evaluate_models(self)
+This method assesses all fitted supervised estimators against the unseen 20 percent test partition. It generates binary predictions and continuous probability scores, computing Accuracy, Precision, Recall, F1 Score, and ROC AUC. It automatically generates side by side confusion matrices, ROC curve comparisons, and a horizontal bar chart of the top ten Random Forest feature importances, saving confusion_matrices.png, roc_curves.png, and feature_importance.png.
+
+Method 9: run_full_pipeline(self)
+This is the master coordinator method that executes each of the aforementioned methods in their strict sequential dependency order, printing user friendly console progress updates at each milestone.
+
+4.3 System Connectivity and Input Output Flow
+
+The input to the system is a single CSV file: customer_churn.csv.
+The system processes this input entirely in memory using vectorized numpy and pandas operations.
+The outputs produced by the program include:
+1. High resolution visual artifacts stored in the outputs directory (churn_distribution.png, kmeans_evaluation.png, pca_customer_clusters.png, confusion_matrices.png, roc_curves.png, feature_importance.png).
+2. Structured console logs detailing each pipeline step, hyperparameter outputs, and a tabular benchmarking summary.

@@ -1,0 +1,109 @@
+CMP6221 Computing for AI
+Assessment 2 User Guide Project Report
+Academic Year: 2026 2027
+
+Student Name: Abdullah Aijaz
+Student ID: [Student ID]
+Module Title: Computing for AI
+Module Code: CMP6221
+
+
+1. Introduction and Problem Statement
+
+Customer churn is among the greatest financial and operational risks faced by telecommunications service providers. In the modern telecom sector, retaining current subscribers is significantly more economical than acquiring new customers, with customer acquisition expenses often exceeding retention investments by a factor of five. When clients cancel subscriptions, companies forfeit continuous monthly cash flows and onboarding investments.
+
+This project implements an automated, data driven machine learning application developed in Python to identify subscribers exhibiting a high risk of churn prior to cancellation. Early warning permits marketing and customer service teams to deploy customized loyalty incentives, proactive customer support, and optimized tariff plans to retain clients.
+
+
+2. Case Study Dataset and Features
+
+The application operates upon the Telco Customer Churn dataset, obtained from Kaggle and published by IBM. The dataset comprises 7043 residential customer records across North America with 21 attributes:
+Demographics: gender, SeniorCitizen, Partner, and Dependents.
+Account Information: tenure (duration of customer loyalty in months), Contract (Month to month, One year, Two year), PaperlessBilling, PaymentMethod, MonthlyCharges, and TotalCharges.
+Subscribed Services: PhoneService, MultipleLines, InternetService (DSL, Fiber optic, None), OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport, StreamingTV, and StreamingMovies.
+Target Variable: Churn (Yes or No). In the raw records, 5174 customers are retained (73.5 percent) and 1869 have churned (26.5 percent).
+
+
+3. Data Preprocessing and Cleaning
+
+Raw data frequently contains noise and missing points that impair model fitting. The pipeline systematically addresses these challenges:
+Data Cleaning: The non predictive unique identifier customerID is dropped.
+Missing Value Imputation: Investigation revealed 11 blank whitespace entries within TotalCharges, representing new customers with zero tenure. These blanks were coerced into numeric representations and imputed using the median value of 1397.47, which provides greater resilience against financial skewness than the arithmetic mean.
+Target Transformation: Churn text labels are mapped to binary integers where Yes corresponds to 1 and No corresponds to 0.
+Outlier Capping: Continuous attributes (tenure, MonthlyCharges, TotalCharges) are evaluated using the Interquartile Range method. Values falling beyond 1.5 times the interquartile range are clipped to boundary thresholds.
+Categorical Encoding: Categorical attributes are converted via One Hot Encoding with drop_first enabled to avoid multicollinearity, expanding the predictors into 30 numerical features.
+Stratification and Scaling: Data is split into 80 percent training (5634 records) and 20 percent testing (1409 records) subsets using stratified sampling. StandardScaler normalizes features to zero mean and unit variance based strictly on training distributions.
+
+
+4. Program Architecture and Object Oriented Design
+
+The software follows Object Oriented Programming paradigms, encapsulating all functionality inside the CustomerChurnPipeline class:
+init: Initializes dataset paths, parameters, scaling instances, and creates the outputs directory.
+verify_data_integrity: Generates a cryptographic SHA 256 hash of the dataset to guard against tampering and unauthorized disclosure.
+load_dataset: Loads the raw CSV into memory using pandas.
+explore_and_clean_data: Handles missing data, applies outlier capping, and exports churn_distribution.png.
+prepare_features: Encodes categories, executes stratified splitting, and scales feature matrices.
+run_unsupervised_models: Conducts K Means clustering (k equals 2 to 6 evaluation) and Principal Component Analysis for 2D spatial projection, generating kmeans_evaluation.png and pca_customer_clusters.png.
+train_supervised_models: Fits Logistic Regression and executes GridSearchCV hyperparameter tuning across 18 permutations for Random Forest.
+evaluate_models: Assesses estimators against the unseen test partition, exporting confusion_matrices.png, roc_curves.png, and feature_importance.png.
+run_full_pipeline: Coordinates execution sequentially.
+
+
+5. Machine Learning Algorithms
+
+5.1 Unsupervised Algorithms
+K Means Clustering: Iteratively partitions customers by minimizing within cluster sum of squares (inertia). Evaluated through the Elbow Method and Silhouette Analysis, k equals 3 was established as optimal. The three personas identified are:
+Cluster 0 (21.5 percent): Highly loyal, long tenure customers on multi year contracts.
+Cluster 1 (44.2 percent): Budget conscious subscribers with low monthly expenditure.
+Cluster 2 (34.2 percent): High churn risk, short tenure users on month to month fiber optic packages.
+Principal Component Analysis: Reduces 30 encoded dimensions into 2 orthogonal axes. Principal Component 1 captures 33.2 percent variance and Component 2 captures 12.0 percent variance, providing an intuitive 2D map of customer segments.
+
+5.2 Supervised Algorithms
+Logistic Regression: Utilizes the sigmoid activation function to map linear combinations of feature weights into posterior churn probabilities. Regularized via L2 Ridge penalties to curb overparameterization.
+Random Forest Classifier: An ensemble of decorrelated decision trees built through bootstrap aggregation (bagging) and random subspace feature sampling. Optimized via 3 fold cross validation across tree depth, estimator quantity, and sample split limits. The optimal parameters identified are max_depth equals 10, min_samples_split equals 5, and n_estimators equals 50.
+
+
+6. Step by Step User Guide
+
+6.1 Prerequisites and Setup
+1. Verify Python 3.10 or higher is installed.
+2. Install dependencies via terminal:
+pip install numpy pandas scikit learn matplotlib seaborn
+3. Ensure customer_churn.csv and customer_churn_pipeline.py exist in the active directory.
+
+6.2 Running the Program
+1. Open the terminal and navigate to the project directory.
+2. Execute the script:
+python customer_churn_pipeline.py
+3. The console displays live milestones: SHA 256 integrity verification, data cleaning outputs, cluster summaries, GridSearchCV best parameters, and the final benchmarking table. Execution completes in approximately 12 seconds.
+4. Alternatively, launch customer_churn_notebook.ipynb in Jupyter to observe code execution and view generated figures inline.
+
+6.3 Outputs and Video Link
+All six charts are saved automatically to the outputs directory.
+Video Walkthrough Link: [Insert Panopto or YouTube URL Here]
+
+
+7. Benchmarking, Results, and Business Insights
+
+7.1 Performance Comparison
+Evaluation on 1409 unseen test customers yielded:
+Logistic Regression: Accuracy 80.70 percent, Precision 65.84 percent, Recall 56.68 percent, F1 Score 60.92 percent, ROC AUC 84.16 percent.
+Random Forest: Accuracy 79.63 percent, Precision 64.65 percent, Recall 51.34 percent, F1 Score 57.23 percent, ROC AUC 83.91 percent.
+
+7.2 Diagnostic Discussion
+Because churn dataset distributions are imbalanced, recall and F1 score represent the most critical operational indicators. Failing to detect a departing client (False Negative) is substantially costlier than providing a discount to an existing customer (False Positive). Logistic Regression outperformed Random Forest in recall (56.68 percent versus 51.34 percent), successfully flagging 212 churning clients compared to 192 for Random Forest.
+
+7.3 Business Implications
+Feature importance appraisal confirms that tenure, TotalCharges, MonthlyCharges, Month to month contracts, and Fiber optic service are the most significant drivers of attrition. Telecommunications managers should introduce early lifecycle loyalty perks during months 1 to 6, incentivize subscribers to transition from month to month arrangements to annual agreements, and audit fiber optic service reliability to reduce customer loss.
+
+
+8. Academic References
+
+Breiman, L., 2001. Random forests. Machine Learning, 45(1), pp.5 32.
+Hastie, T., Tibshirani, R. and Friedman, J., 2009. The Elements of Statistical Learning. 2nd ed. New York: Springer.
+Hosmer, D.W., Lemeshow, S. and Sturdivant, R.X., 2013. Applied Logistic Regression. 3rd ed. Hoboken: John Wiley and Sons.
+IBM Corporation, 2021. Telco Customer Churn Dataset. Kaggle. Available at: https://www.kaggle.com/datasets/blastchar/telco customer churn [Accessed 17 October 2026].
+Jolliffe, I.T. and Cadima, J., 2016. Principal component analysis. Philosophical Transactions of the Royal Society A, 374(2065), p.20150202.
+MacQueen, J., 1967. Some methods for classification of multivariate observations. In: 5th Berkeley Symposium. Berkeley: UC Press, pp.281 297.
+Pedregosa, F. et al., 2011. Scikit learn: Machine learning in Python. Journal of Machine Learning Research, 12, pp.2825 2830.
+Rousseeuw, P.J., 1987. Silhouettes: a graphical aid to cluster analysis. Journal of Computational and Applied Mathematics, 20, pp.53 65.

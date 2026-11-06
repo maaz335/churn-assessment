@@ -1,0 +1,19 @@
+Section 8: Academic References
+
+Breiman, L., 2001. Random forests. Machine Learning, 45(1), pp.5 32.
+
+Hastie, T., Tibshirani, R. and Friedman, J., 2009. The Elements of Statistical Learning: Data Mining, Inference, and Prediction. 2nd ed. New York: Springer.
+
+Hosmer, D.W., Lemeshow, S. and Sturdivant, R.X., 2013. Applied Logistic Regression. 3rd ed. Hoboken: John Wiley and Sons.
+
+IBM Corporation, 2021. Telco Customer Churn Dataset. Available at Kaggle: https://www.kaggle.com/datasets/blastchar/telco customer churn [Accessed 17 October 2026].
+
+Jolliffe, I.T. and Cadima, J., 2016. Principal component analysis: a review and recent developments. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences, 374(2065), p.20150202.
+
+MacQueen, J., 1967. Some methods for classification and analysis of multivariate observations. In: Proceedings of the Fifth Berkeley Symposium on Mathematical Statistics and Probability. Berkeley: University of California Press, pp.281 297.
+
+McKinney, W., 2010. Data structures for statistical computing in Python. In: Proceedings of the 9th Python in Science Conference. Austin: SciPy, pp.51 56.
+
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V. and Vanderplas, J., 2011. Scikit learn: Machine learning in Python. Journal of Machine Learning Research, 12, pp.2825 2830.
+
+Rousseeuw, P.J., 1987. Silhouettes: a graphical aid to the interpretation and validation of cluster analysis. Journal of Computational and Applied Mathematics, 20, pp.53 65.
